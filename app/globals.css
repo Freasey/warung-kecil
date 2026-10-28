@@ -1,14 +1,15 @@
 :root {
   --bg: #0b0d10;
-  --card: #15191f;
-  --card-hover: #1b2028;
-  --border: #272d37;
-  --text: #e7ecf3;
-  --muted: #8b95a5;
+  --surface: #13171c;
+  --surface-2: #181d24;
+  --border: #252b34;
+  --text: #e8edf3;
+  --muted: #8a94a3;
   --primary: #4ade80;
   --primary-ink: #052e16;
+  --flex: #4ade80;
+  --deadline: #fbbf24;
   --danger: #f87171;
-  --warn: #fbbf24;
 }
 
 * {
@@ -26,54 +27,58 @@ body {
   color: var(--text);
   font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
   line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: var(--primary);
 }
 
 .wrap {
-  max-width: 920px;
+  max-width: 1100px;
   margin: 0 auto;
-  padding: 24px 16px 64px;
+  padding: 28px 16px 64px;
+}
+
+/* Header */
+.head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
 }
 
 h1 {
   font-size: 22px;
-  margin: 0 0 4px;
+  letter-spacing: -0.01em;
+  margin: 0;
 }
 
 .sub {
   color: var(--muted);
   font-size: 14px;
-  margin: 0 0 20px;
+  margin: 2px 0 0;
 }
 
-.card {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 16px;
-  margin-bottom: 16px;
+.center {
+  text-align: center;
 }
 
-.card h2 {
-  font-size: 15px;
-  margin: 0 0 10px;
-}
-
-code.inline,
-pre {
-  background: #0d1117;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  color: #d6deeb;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+.meta {
+  color: var(--muted);
   font-size: 12.5px;
 }
 
-pre {
-  padding: 12px;
-  overflow-x: auto;
-  white-space: pre-wrap;
-  word-break: break-all;
-  margin: 0 0 10px;
+.meta.err,
+.msg.err {
+  color: var(--danger);
+}
+
+.msg {
+  font-size: 13.5px;
+  margin: 10px 0 0;
 }
 
 .row {
@@ -83,26 +88,15 @@ pre {
   align-items: center;
 }
 
-textarea {
-  width: 100%;
-  min-height: 70px;
-  background: #0d1117;
-  color: var(--text);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 10px;
-  font-family: ui-monospace, monospace;
-  font-size: 12.5px;
-  resize: vertical;
-}
-
+/* Buttons */
 button {
   background: var(--primary);
   color: var(--primary-ink);
   border: 0;
   border-radius: 8px;
-  padding: 9px 16px;
-  font-weight: 700;
+  padding: 8px 14px;
+  font: inherit;
+  font-weight: 650;
   font-size: 14px;
   cursor: pointer;
 }
@@ -113,98 +107,258 @@ button.ghost {
   border: 1px solid var(--border);
 }
 
+button.ghost:hover:not(:disabled) {
+  border-color: var(--muted);
+}
+
+button.sm {
+  padding: 5px 10px;
+  font-size: 12.5px;
+}
+
 button:disabled {
   opacity: 0.5;
   cursor: default;
 }
 
-ol.steps {
-  margin: 0;
-  padding-left: 18px;
-  color: var(--muted);
-  font-size: 13.5px;
-}
-
-ol.steps li {
-  margin-bottom: 4px;
-}
-
-.msg {
-  font-size: 13.5px;
-  margin: 8px 0 0;
-}
-
-.msg.err {
-  color: var(--danger);
-}
-
-.msg.ok {
-  color: var(--primary);
-}
-
-.proj {
-  display: block;
-  background: var(--card);
+/* Setup panel */
+.panel {
+  background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 14px;
-  margin-bottom: 10px;
-  text-decoration: none;
-  color: inherit;
-  transition: border-color 0.15s, background 0.15s;
+  border-radius: 14px;
+  padding: 18px;
+  margin-bottom: 22px;
+  display: grid;
+  gap: 18px;
 }
 
-.proj:hover {
+.step {
+  display: flex;
+  gap: 12px;
+}
+
+.step p {
+  margin: 0 0 8px;
+  font-size: 14px;
+}
+
+.num {
+  flex: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  display: grid;
+  place-items: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--muted);
+}
+
+.grow {
+  flex: 1;
+  min-width: 0;
+}
+
+pre {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: #cfd8e3;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 12px;
+  padding: 10px 12px;
+  margin: 0 0 8px;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+textarea {
+  width: 100%;
+  min-height: 64px;
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-family: ui-monospace, monospace;
+  font-size: 12px;
+  resize: vertical;
+  margin-bottom: 8px;
+}
+
+textarea:focus {
+  outline: none;
   border-color: var(--primary);
-  background: var(--card-hover);
 }
 
-.proj .top {
+/* Toolbar + toggles */
+.toolbar {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   gap: 10px;
-  align-items: baseline;
   flex-wrap: wrap;
+  margin-bottom: 14px;
 }
 
-.proj .code {
-  font-weight: 700;
-  font-family: ui-monospace, monospace;
-}
-
-.proj .desc {
-  color: var(--text);
-  font-size: 14px;
-  margin: 6px 0 8px;
-}
-
-.badges {
+.toggles {
   display: flex;
-  gap: 6px;
+  gap: 8px;
   flex-wrap: wrap;
 }
 
-.badge {
+.toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: transparent;
+  color: var(--muted);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 6px 13px;
+  font-size: 13px;
+  font-weight: 600;
+  transition: all 0.15s;
+}
+
+.toggle b {
+  font-weight: 700;
+  color: inherit;
+  opacity: 0.8;
+}
+
+.toggle .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--border);
+  transition: background 0.15s;
+}
+
+.toggle.flex.on {
+  color: var(--flex);
+  border-color: color-mix(in srgb, var(--flex) 50%, transparent);
+  background: color-mix(in srgb, var(--flex) 8%, transparent);
+}
+
+.toggle.flex.on .dot {
+  background: var(--flex);
+}
+
+.toggle.deadline.on {
+  color: var(--deadline);
+  border-color: color-mix(in srgb, var(--deadline) 50%, transparent);
+  background: color-mix(in srgb, var(--deadline) 8%, transparent);
+}
+
+.toggle.deadline.on .dot {
+  background: var(--deadline);
+}
+
+/* Card grid */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 12px;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-top: 3px solid var(--border);
+  border-radius: 12px;
+  padding: 14px 14px 12px;
+  color: inherit;
+  text-decoration: none;
+  transition: transform 0.12s, border-color 0.12s, background 0.12s;
+}
+
+.card.flex {
+  border-top-color: color-mix(in srgb, var(--flex) 70%, transparent);
+}
+
+.card.deadline {
+  border-top-color: color-mix(in srgb, var(--deadline) 70%, transparent);
+}
+
+.card:hover {
+  background: var(--surface-2);
+  transform: translateY(-2px);
+  border-color: #3a4250;
+}
+
+.card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-weight: 700;
+  font-size: 13.5px;
+}
+
+.ago {
+  color: var(--muted);
+  font-size: 11.5px;
+  white-space: nowrap;
+}
+
+.desc {
+  margin: 0;
+  font-size: 14px;
+  color: #d3dae3;
+  flex: 1;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  word-break: break-word;
+}
+
+.card-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+}
+
+.type {
+  color: var(--muted);
+  font-size: 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pill {
+  flex: none;
   font-size: 11px;
   font-weight: 700;
   padding: 2px 8px;
   border-radius: 999px;
-  border: 1px solid var(--border);
-  color: var(--muted);
   white-space: nowrap;
 }
 
-.badge.deadline {
-  color: var(--warn);
-  border-color: color-mix(in srgb, var(--warn) 45%, transparent);
+.pill.flex {
+  color: var(--flex);
+  background: color-mix(in srgb, var(--flex) 12%, transparent);
 }
 
-.badge.flex {
-  color: var(--primary);
-  border-color: color-mix(in srgb, var(--primary) 45%, transparent);
+.pill.deadline {
+  color: var(--deadline);
+  background: color-mix(in srgb, var(--deadline) 12%, transparent);
 }
 
-.meta {
-  color: var(--muted);
-  font-size: 12.5px;
+.foot {
+  margin-top: 18px;
 }

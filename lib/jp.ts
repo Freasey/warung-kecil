@@ -153,8 +153,10 @@ export async function fetchFilteredProjects(token: string): Promise<FetchResult>
     if ((status ?? "").toUpperCase() === "OPEN") flex.push(toProject(r, "flex", status));
   }
 
-  const sortKey = (p: Project) => p.bidDeadline ?? p.createdAt ?? "";
-  const projects = [...deadline, ...flex].sort((a, b) => sortKey(a).localeCompare(sortKey(b)));
+  // Terbaru dulu (berdasarkan waktu proyek dibuat).
+  const projects = [...deadline, ...flex].sort((a, b) =>
+    (b.createdAt ?? "").localeCompare(a.createdAt ?? ""),
+  );
 
   return { today, totalOpen: list.length, projects };
 }
