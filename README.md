@@ -1,49 +1,43 @@
-# Discord Thread Tracker (Next.js)
+# Otomasi Website (nama sementara)
 
-> Status: tahap perencanaan. Repo ini di-reset dari awal; kode belum ditulis.
+> Status: tahap perencanaan. Repo di-reset dari awal; kode belum ditulis.
 
 ## Tujuan
 
-Mengambil semua thread di server Discord yang dibuat admin (kapan saja, acak),
-menyaring hanya thread yang berisi **URL unik dari admin**, lalu menampilkannya
-di aplikasi Next.js, **diurutkan berdasarkan tanggal pesan terakhir yang
-mengandung URL tersebut**.
+Membuat website/tool sendiri yang memakai **backend website target** (cara login
+dan ambil data tetap sama seperti di website aslinya), supaya alur kerja yang
+sekarang lambat/kurang efisien bisa diotomasi.
 
-## Alur
+## Pendekatan
 
-1. Ambil daftar channel/forum yang bisa diakses.
-2. Ambil semua thread: aktif + arsip (public, dan private bila punya akses).
-3. Untuk tiap thread, baca riwayat pesan dan cari pesan yang mengandung URL target
-   (opsional: hanya dari user admin tertentu).
-4. Simpan per thread: `id`, `judul`, `link`, `tanggal pesan terakhir berisi URL`.
-5. Urutkan menurun berdasarkan tanggal itu dan tampilkan di Next.js.
-6. Sinkron berkala (cron) + opsional real-time (event `threadCreate` / `messageCreate`).
+1. **Analisa backend website target**
+   - Buka website di browser → DevTools → tab **Network** (filter `Fetch/XHR`).
+   - Lakukan login dan ambil data seperti biasa, lalu **Export HAR**.
+   - Catat: endpoint login, cara sesi disimpan (cookie / token Bearer / CSRF),
+     endpoint data, parameter, paginasi, dan format respons (JSON/HTML).
+2. **Pilih cara akses**
 
-## Opsi akses ke Discord
+   | Opsi | Kapan dipakai | Catatan |
+   |---|---|---|
+   | **A. Panggil API langsung (HTTP)** | Website memakai API JSON / form biasa | Paling cepat & ringan. Login → simpan cookie/token → panggil endpoint data. |
+   | B. Otomasi browser (Playwright) | Ada captcha, JS rumit, token yang di-generate di browser | Lebih lambat, tapi pasti jalan seperti user biasa. |
+   | C. Gabungan | Login via browser, ambil data via API | Sering paling praktis. |
 
-| Opsi | Butuh admin? | Aman (sesuai ToS)? | Catatan |
-|---|---|---|---|
-| **A. Bot Discord** | Ya, admin harus invite bot | Ya | Cara resmi. Bot perlu izin `View Channel`, `Read Message History`, dan intent `Message Content`. |
-| B. Token akun pribadi (self-bot) | Tidak | **Tidak** | Melanggar ToS Discord, risiko akun di-ban. Tidak direkomendasikan. |
-| C. Export manual (mis. file JSON) lalu upload ke app | Tidak | Tergantung alat export | Tidak otomatis. |
+3. **Bangun tool sendiri** di atas endpoint tersebut (UI ringkas + tombol/
+   jadwal otomatis, export data, dsb).
 
-Rekomendasi: **Opsi A**.
+## Batasan & etika
 
-## Rencana teknis (Opsi A)
-
-- Next.js (App Router) + TypeScript
-- `discord.js` / Discord REST API v10 di server-side (route handler / cron job)
-- Endpoint penting:
-  - `GET /guilds/{guild}/threads/active`
-  - `GET /channels/{channel}/threads/archived/public`
-  - `GET /channels/{channel}/messages?before=…&limit=100` (paginasi)
-- Penyimpanan: SQLite / Postgres (mis. via Prisma) supaya tidak scan ulang semua pesan.
-- Env: `DISCORD_BOT_TOKEN`, `DISCORD_GUILD_ID`, `TARGET_URL`, `ADMIN_USER_IDS` (opsional).
+- Hanya untuk akun dan data yang memang kita punya akses resminya.
+- Cek Syarat & Ketentuan website target soal otomasi/scraping.
+- Jangan bypass captcha / proteksi keamanan; beri jeda antar request (rate limit).
+- Kredensial disimpan di `.env`, **tidak** di-commit.
 
 ## Yang perlu dikonfirmasi
 
-- [ ] URL unik yang dicari (persis atau pola/prefix?)
-- [ ] Apakah admin bersedia meng-invite bot?
-- [ ] Channel/forum mana saja yang dipantau?
-- [ ] Hanya pesan dari admin, atau siapa pun yang mengirim URL itu?
+- [ ] URL website target
+- [ ] Alur yang mau diotomasi (langkah demi langkah seperti dikerjakan manual)
+- [ ] Data apa yang diambil & mau dipakai untuk apa (tampil, export Excel, dll.)
+- [ ] Jenis login (username/password, OTP, captcha, SSO?)
+- [ ] File HAR / contoh request dari tab Network (hapus password/token sebelum dibagikan)
 - [ ] Otomasi tambahan lainnya
