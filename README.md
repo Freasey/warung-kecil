@@ -104,22 +104,22 @@ Frontend kita ◄──────── hanya data yang sudah difilter (bebera
 - [ ] Deadline hari ini: masih ditampilkan (≥ hari ini) atau hanya setelah hari ini (> hari ini)?
 - [ ] Sembunyikan proyek yang sudah di-bid?
 - [ ] Interval sync & kanal notifikasi proyek baru
-- [ ] Deploy & notifikasi: usul Cloudflare Workers (Cron + KV/D1) + Discord webhook / Telegram bot (lihat bawah)
+- [x] Deploy: Vercel + Next.js, tanpa notifikasi
 - [ ] Otomasi tambahan lainnya
 
-## Deploy gratis & notifikasi (usulan)
+## Deploy (keputusan: tanpa notifikasi)
 
-**Kendala utama:** token JWT hanya berlaku ±24 jam dan login hanya lewat Google
-(tidak ditemukan endpoint refresh token di JS frontend). Jadi token harus ditempel
-ulang ±1x sehari; tool mengirim pengingat sebelum token kedaluwarsa (`exp` di JWT).
+**Vercel (gratis) + Next.js.** Tidak ada cron/DB; data diambil saat halaman dibuka.
 
-| Opsi | Jadwal | Simpan data | Catatan |
-|---|---|---|---|
-| **Cloudflare Workers** (usulan) | Cron Trigger, bisa tiap 1–5 menit | KV / D1 (SQLite) | Gratis 100rb request/hari, tidak tidur, ada URL untuk UI + form ganti token |
-| GitHub Actions (cron) | min. 5 menit, sering telat | file di repo / cache | Ganti token = update secret tiap hari, kurang praktis |
-| Vercel Hobby | cron cuma 1x/hari | butuh DB eksternal | Tidak cocok untuk notifikasi |
-| Render / Koyeb free | – | – | Instance tidur saat idle |
+```
+Browser kita ──token──► Next.js API route (Vercel) ──GET──► api.jokiproyek.com
+     ▲                         │ filter + cache ±5 menit
+     └──── hanya proyek lolos filter ◄┘
+```
 
-**Notifikasi:** Discord webhook (paling simpel, cukup 1 URL) atau Telegram bot
-(notif HP lebih cepat). Isi pesan: kode proyek, tipe, deadline, ringkasan, link
-`https://coder.jokiproyek.com/bidding/<kode>?req=<req_id>`.
+- Proxy server tetap perlu: API asli kemungkinan besar hanya mengizinkan CORS dari
+  `coder.jokiproyek.com`, jadi browser kita tidak bisa memanggilnya langsung.
+- Token (±24 jam) ditempel di halaman kita dan disimpan di browser (localStorage),
+  bukan di server/repo. API 401 → minta token baru.
+- Cache hasil per token ±5 menit supaya ~38 panggilan detail (proyek Fleksibel) tidak
+  diulang setiap refresh.
