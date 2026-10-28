@@ -89,7 +89,8 @@ Frontend kita ◄──────── hanya data yang sudah difilter (bebera
 2. **Filter di backend** langsung saat sync:
    - `bid_deadline_internal` ≥ hari ini (zona waktu `Asia/Jakarta`)
    - opsional: buang yang sudah di-bid (cocokkan `pro_id:req_id` dengan `/history`)
-   - opsional: proyek tanpa deadline ("Fleksibel") ditampilkan / disembunyikan sesuai pilihan
+   - proyek tanpa deadline ("Fleksibel"): hanya yang `request.created_at` ≤ 30 hari terakhir
+     (dan `bidding_status` dari endpoint detail = `OPEN`, dicek hanya untuk yang lolos filter umur)
 3. **Simpan hanya hasil filter** (SQLite / cache memori) beserta `first_seen_at`.
 4. **Frontend** cuma memanggil endpoint kita (`GET /api/projects`) yang langsung
    membaca data tersimpan, jadi cepat dan tidak membebani API asli.
@@ -99,9 +100,26 @@ Frontend kita ◄──────── hanya data yang sudah difilter (bebera
 
 ## Yang perlu dikonfirmasi
 
-- [ ] Proyek "Fleksibel" (192, semuanya `OPEN`): saring dengan umur maksimal berapa hari, dan/atau buang yang deadline kliennya sudah lewat?
+- [x] Proyek "Fleksibel": tampil jika dibuat ≤ 30 hari terakhir (±38 proyek per 28-10-2026)
 - [ ] Deadline hari ini: masih ditampilkan (≥ hari ini) atau hanya setelah hari ini (> hari ini)?
 - [ ] Sembunyikan proyek yang sudah di-bid?
 - [ ] Interval sync & kanal notifikasi proyek baru
-- [ ] Stack: usul Next.js + SQLite (satu project, mudah di-deploy)
+- [ ] Deploy & notifikasi: usul Cloudflare Workers (Cron + KV/D1) + Discord webhook / Telegram bot (lihat bawah)
 - [ ] Otomasi tambahan lainnya
+
+## Deploy gratis & notifikasi (usulan)
+
+**Kendala utama:** token JWT hanya berlaku ±24 jam dan login hanya lewat Google
+(tidak ditemukan endpoint refresh token di JS frontend). Jadi token harus ditempel
+ulang ±1x sehari; tool mengirim pengingat sebelum token kedaluwarsa (`exp` di JWT).
+
+| Opsi | Jadwal | Simpan data | Catatan |
+|---|---|---|---|
+| **Cloudflare Workers** (usulan) | Cron Trigger, bisa tiap 1–5 menit | KV / D1 (SQLite) | Gratis 100rb request/hari, tidak tidur, ada URL untuk UI + form ganti token |
+| GitHub Actions (cron) | min. 5 menit, sering telat | file di repo / cache | Ganti token = update secret tiap hari, kurang praktis |
+| Vercel Hobby | cron cuma 1x/hari | butuh DB eksternal | Tidak cocok untuk notifikasi |
+| Render / Koyeb free | – | – | Instance tidur saat idle |
+
+**Notifikasi:** Discord webhook (paling simpel, cukup 1 URL) atau Telegram bot
+(notif HP lebih cepat). Isi pesan: kode proyek, tipe, deadline, ringkasan, link
+`https://coder.jokiproyek.com/bidding/<kode>?req=<req_id>`.
