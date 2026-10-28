@@ -37,6 +37,7 @@ tool. Saat token kedaluwarsa (API balas 401) tool minta token baru.
 | 18082 | `/api/jp-teams/completeness` | Status kelengkapan data (HP, Discord, bank) |
 | 18082 | `/api/jp-teams/bank/me` | Data rekening |
 | 18083 | `/api/bidding/engineer/projects` | Semua proyek "open" untuk di-bid |
+| 18083 | `/api/bidding/engineer/projects/detail/{pro_chrg_code}` | Detail 1 proyek: `bidding_status`, `deadline`, `minimum_rate`, `winner_user_id`, `channel_id` (Discord) |
 | 18083 | `/api/bidding/engineer/projects/history` | Riwayat bid sendiri (`bid_status`, `bid_rate`, dll.) |
 | 18084 | `/api/payouts/engineer/history` | Riwayat pencairan dana |
 
@@ -49,7 +50,11 @@ Halaman website: `/bidding`, `/bidding/<pro_chrg_code>?req=<req_id>`, `/profile`
 website sebagai "Deadline"), `request.req_budget`, `request.req_tier`,
 `highest_bid`, `is_highest_bid_visible`.
 
-Tidak ada field status proyek; endpoint ini sendiri sudah berarti "open".
+Tidak ada field status di daftar ini. Status ada di endpoint detail
+(`bidding_status`), tapi dicek 28-10-2026: **semua 192 proyek "Fleksibel" berstatus
+`OPEN`**, termasuk yang dibuat tahun 2025, dan tidak satu pun punya `winner_user_id`.
+Jadi `bidding_status` tidak bisa dipakai untuk menyaring proyek basi. Pengganti yang
+masuk akal: umur proyek (`request.created_at`) dan/atau deadline klien (`deadline`).
 
 ## Masalah: data terlalu banyak
 
@@ -94,7 +99,7 @@ Frontend kita ◄──────── hanya data yang sudah difilter (bebera
 
 ## Yang perlu dikonfirmasi
 
-- [ ] Proyek tanpa deadline ("Fleksibel", ±192 proyek): tampilkan atau sembunyikan?
+- [ ] Proyek "Fleksibel" (192, semuanya `OPEN`): saring dengan umur maksimal berapa hari, dan/atau buang yang deadline kliennya sudah lewat?
 - [ ] Deadline hari ini: masih ditampilkan (≥ hari ini) atau hanya setelah hari ini (> hari ini)?
 - [ ] Sembunyikan proyek yang sudah di-bid?
 - [ ] Interval sync & kanal notifikasi proyek baru
