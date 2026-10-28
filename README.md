@@ -1,10 +1,29 @@
-# JokiProyek Engineer Tool (nama sementara)
+# JP Engineer Tool
 
-> Status: tahap perencanaan. Repo di-reset dari awal; kode belum ditulis.
+Website pribadi untuk engineer di `coder.jokiproyek.com`: memakai backend yang sama,
+tapi daftar proyeknya **sudah difilter** (deadline bidding masih berjalan, atau proyek
+Fleksibel yang dibuat ≤ 30 hari dan status `OPEN`). Next.js, deploy di Vercel.
 
-Tool pribadi untuk engineer di `coder.jokiproyek.com`: memakai backend yang sama
-(login & data tetap dari website aslinya), tapi tampilannya lebih ringkas dan
-bisa diotomasi.
+## Cara pakai
+
+1. `npm install`
+2. `npm run dev` lalu buka http://localhost:3000
+3. Login di `coder.jokiproyek.com`, buka Console (F12), tempel one-liner dari
+   halaman utama → token tersalin ke clipboard.
+4. Paste token di app → daftar proyek muncul.
+
+Token (±24 jam) disimpan di browser (localStorage), **tidak** di server/repo.
+API 401 = token kedaluwarsa, ambil baru.
+
+## Deploy (Vercel, gratis)
+
+Push repo ke GitHub → vercel.com → New Project → import repo → Deploy (tanpa env var).
+
+## Struktur kode
+
+- `app/page.tsx` — halaman utama: one-liner console, input token, daftar proyek.
+- `app/api/projects/route.ts` — server perantara (bebas CORS) ke API JokiProyek.
+- `lib/jp.ts` — ambil data + filter + cek status Fleksibel. **GET saja.**
 
 ## Aturan kerja
 
