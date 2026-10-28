@@ -119,7 +119,30 @@ Browser kita ──token──► Next.js API route (Vercel) ──GET──► 
 
 - Proxy server tetap perlu: API asli kemungkinan besar hanya mengizinkan CORS dari
   `coder.jokiproyek.com`, jadi browser kita tidak bisa memanggilnya langsung.
-- Token (±24 jam) ditempel di halaman kita dan disimpan di browser (localStorage),
-  bukan di server/repo. API 401 → minta token baru.
+- Token (±24 jam) disimpan di browser kita (localStorage), bukan di server/repo.
+  API 401 → ambil token baru.
+
+### Login: 1 klik, bukan copy-paste DevTools
+
+Tujuan: user klik tombol "Login with Google" yang sama, token langsung masuk ke app kita.
+
+Kendala (hasil cek 28-10-2026):
+- `redirect_uri` ke Google **dikunci** ke `api.jokiproyek.com/.../callback`
+  (milik mereka). `return_url` tidak diteruskan ke Google (tanpa `state`, tanpa cookie sesi).
+  → Alur Google mereka **tidak bisa** diarahkan mengantar token ke domain kita.
+- Tapi cookie `authTokenPlcs` **bukan HttpOnly** (frontend mereka membacanya via JS),
+  jadi JavaScript di tab `coder.jokiproyek.com` bisa membacanya.
+
+Solusi (tanpa buka DevTools):
+1. **Bookmarklet** (usulan — tanpa instal): user login Google seperti biasa di
+   `coder.jokiproyek.com`, lalu klik 1 bookmarklet. Bookmarklet membaca
+   `authTokenPlcs` dari `document.cookie` dan mengirimnya ke app kita (lalu app
+   simpan di localStorage). Sejak itu app pakai token yang sama (`Authorization: Bearer`).
+2. **Browser extension**: ambil cookie otomatis, UX paling mulus, tapi perlu instal.
+3. ~~Headless login Google di server~~: ditolak Google (deteksi bot), butuh password
+   Google user, rapuh. **Tidak dipakai.**
+
+App kita memakai **sistem token yang sama** persis: menyimpan JWT dan memanggil API
+JokiProyek dengan header `Authorization: Bearer <token>`.
 - Cache hasil per token ±5 menit supaya ~38 panggilan detail (proyek Fleksibel) tidak
   diulang setiap refresh.
